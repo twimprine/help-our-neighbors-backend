@@ -40,6 +40,6 @@ deploy:
 		--stack-name "${STACK_NAME}" \
 		--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
-deploy-stack: clean install build validate package deploy
+deploy-stack: clean install build package deploy
 
 local-package: clean install validate build bundle

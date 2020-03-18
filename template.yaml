@@ -1,7 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 # Description:
-# Parameters:
+Parameters:
+  MailGunApiKey:
+    Type: String
+    Default: ""
+  Domain:
+    Type: String
+    Default: ""
 
 Globals:
   Function:
@@ -24,3 +30,23 @@ Resources:
         - AttributeName: timestamp
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
+
+  EmailLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./handler.zip
+      Handler: email.handler
+      Environment:
+        Variables:
+          EMAIL_DDB_TABLE: !Ref EmailTable
+          MAIL_GUN_API_KEY: !Ref MailGunApiKey
+          DOMAIN: !Ref Domain
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref EmailTable
+      Events:
+        EmailDownload:
+          Type: Api
+          Properties:
+            Path: /email
+            Method: post

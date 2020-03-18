@@ -1,3 +1,7 @@
+.envrc
+handler.zip
+packaged.yaml
+
 # Logs
 logs
 *.log
