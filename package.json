@@ -48,8 +48,10 @@
   },
   "dependencies": {
     "@types/mailgun-js": "^0.22.3",
+    "@types/uuid": "^7.0.2",
+    "aws-sdk": "^2.521.0",
     "bunyan": "^1.8.12",
     "mailgun-js": "^0.22.0",
-    "aws-sdk": "^2.521.0"
+    "uuid": "^7.0.2"
   }
 }

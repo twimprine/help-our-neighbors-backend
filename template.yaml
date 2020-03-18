@@ -18,6 +18,7 @@ Resources:
 
   EmailTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
     Properties:
       AttributeDefinitions:
         - AttributeName: to_email
@@ -30,6 +31,10 @@ Resources:
         - AttributeName: timestamp
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
 
   EmailLambdaFunction:
     Type: AWS::Serverless::Function
@@ -39,14 +44,56 @@ Resources:
       Environment:
         Variables:
           EMAIL_DDB_TABLE: !Ref EmailTable
+          LISTING_DDB_TABLE: !Ref ListingTable
           MAIL_GUN_API_KEY: !Ref MailGunApiKey
           DOMAIN: !Ref Domain
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref EmailTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref ListingTable
       Events:
-        EmailDownload:
+        Email:
           Type: Api
           Properties:
-            Path: /email
+            Path: /emails
             Method: post
+
+  ListingTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  ListingLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./handler.zip
+      Handler: listing.handler
+      Environment:
+        Variables:
+          LISTING_DDB_TABLE: !Ref ListingTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ListingTable
+      Events:
+        ListingsPost:
+          Type: Api
+          Properties:
+            Path: /listings
+            Method: post
+        ListingsGet:
+          Type: Api
+          Properties:
+            Path: /listings
+            Method: get

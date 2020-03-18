@@ -1,5 +1,8 @@
 default: install build validate
 
+s3-init:
+	aws s3 mb "s3://${S3_BUCKET}"
+
 validate:
 	sam validate
 	cfn-lint -t template.yaml
@@ -38,7 +41,10 @@ deploy:
 	sam deploy \
 		--template-file packaged.yaml \
 		--stack-name "${STACK_NAME}" \
-		--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+		--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+		--parameter-overrides \
+			MailGunApiKey="${MAIL_GUN_API_KEY}" \
+			Domain="${DOMAIN}" \
 
 deploy-stack: clean install build package deploy
 
