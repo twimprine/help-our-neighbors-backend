@@ -14,9 +14,11 @@ interface Listing {
     id: string,
     email: string,
     message: string,
+    name: string,
     latitude: string,
     longitude: string,
-    postcode: number,
+    postcode: string,
+    state: string,
     timestamp: number,
     type: string,
 }
@@ -26,8 +28,10 @@ interface ListingPostData {
     message: string,
     latitude: string,
     longitude: string,
-    postcode: number,
+    postcode: string,
+    state: string,
     type: string,
+    name: string,
 }
 
 // Needed for CORS with Proxy-lambda integration

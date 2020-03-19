@@ -1,0 +1,241 @@
+openapi: 3.0.0
+
+info:
+  title: helpful-neighbours
+  description: An API for Helpful Neighbours. API Key auth.
+  version: 2019-11-07
+
+paths:
+
+  /emails:
+    post:
+      summary: Send an email.
+      operationId: SendEmail
+      description: Send an email.
+      tags:
+      - email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmail'
+      responses:
+        '201':
+          description: email response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailResponse'
+
+  /listings:
+    get:
+      summary: Returns an array of all listings.
+      operationId: ReadListings
+      description: Returns an array of all listings.
+      tags:
+      - listing
+      responses:
+        '200':
+          description: list of listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReadListing'
+
+    post:
+      summary: Create an Listing.
+      operationId: CreateListing
+      description: Create an Listing
+      tags:
+      - listing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateListing'
+      responses:
+        '201':
+          description: listing response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Listing'
+
+components:
+
+  schemas:
+    
+    SendEmail:
+      description: SendEmail payload.
+      type: object
+      required:
+        - listingId
+        - fromEmail
+        - message
+      properties:
+        listingId:
+          type: string
+          format: uuid
+          description: Listing identifier.
+          example: 1ce90bf8-2029-49dc-8aa6-d959ce92fa9b
+        fromEmail:
+          type: string
+        message:
+          type: string
+        name:
+          type: string
+          
+    EmailResponse:
+      description: SendEmail payload.
+      type: object
+      required:
+        - listingId
+        - to_email
+        - from_email
+        - message
+        - name
+        - timestamp
+        - mailgun_id
+        - mailgun_message
+      properties:
+        listingId:
+          type: string
+          format: uuid
+          description: Listing identifier.
+          example: 1ce90bf8-2029-49dc-8aa6-d959ce92fa9b
+        to_email:
+          type: string
+        from_email:
+          type: string
+        message:
+          type: string
+        name:
+          type: string
+        timestamp:
+          format: date-time
+          description: The timestamp the email was sent
+        mailgun_id:
+          type: string
+        mailgun_message:
+          type: string
+  
+    Listing:
+      description: Listing.
+      type: object
+      required:
+        - id
+        - message
+        - latitude
+        - longitude
+        - postcode
+        - state
+        - name
+        - timestamp
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Listing identifier.
+          example: 1ce90bf8-2029-49dc-8aa6-d959ce92fa9b
+        email:
+          type: string
+        message:
+          type: string
+        latitude:
+          type: string
+          example:	-37.840935
+        longitude:
+          type: string
+          example: 144.946457
+        postcode:
+          type: string
+          example: 3000
+        state:
+          type: string
+          example: VIC
+        type:
+          type: string
+        name:
+          type: string
+        timestamp:
+          format: date-time
+          description: The timestamp the listing was created
+    
+    ReadListing:
+      description: Listing response. Email is not returned.
+      type: object
+      required:
+        - id
+        - message
+        - latitude
+        - longitude
+        - postcode
+        - state
+        - name
+        - timestamp
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Listing identifier.
+          example: 1ce90bf8-2029-49dc-8aa6-d959ce92fa9b
+        message:
+          type: string
+        latitude:
+          type: string
+          example:	-37.840935
+        longitude:
+          type: string
+          example: 144.946457
+        postcode:
+          type: string
+          example: 3000
+        state:
+          type: string
+          example: VIC
+        type:
+          type: string
+        name:
+          type: string
+        timestamp:
+          format: date-time
+          description: The timestamp the listing was created
+    
+    CreateListing:
+      description: Payload to create a Listing.
+      type: object
+      required:
+        - email
+        - message
+        - latitude
+        - longitude
+        - postcode
+        - state
+        - name
+      properties:
+        email: 
+          type: string
+        message:
+          type: string
+        latitude:
+          type: string
+          example:	-37.840935
+        longitude:
+          type: string
+          example: 144.946457
+        postcode:
+          type: string
+          example: 3000
+        state:
+          type: string
+          example: VIC
+        type:
+          type: string
+        name:
+          type: string
+

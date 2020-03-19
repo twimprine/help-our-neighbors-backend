@@ -3,6 +3,7 @@
 import bunyan from 'bunyan'
 import Mailgun from 'mailgun-js'
 import { getItem, storeItem } from "./util/dynamodb"
+import { getEmailTemplate } from "./util/emailTemplate"
 
 const MAIL_GUN_API_KEY = process.env.MAIL_GUN_API_KEY ||  ""
 const DOMAIN = process.env.DOMAIN || ""
@@ -53,11 +54,13 @@ export const handler = async (event: any) => {
     });
     logger.info({mailgun}, `Mailgun initialized. Sending email to: ${listing.email}`);
 
+    const formattedEmail = getEmailTemplate(body.name, listing.name, body.message, body.fromEmail)
+
     var data = {
         from: `Helpful Neighbours <${HELPFUL_NEIGHBOURS_EMAIL}>`,
         to: listing.email,
         subject: 'Helpful Neighbours',
-        html: `Test Email from ${body.fromEmail}`
+        html: formattedEmail
     }
 
     try {
@@ -79,7 +82,7 @@ export const handler = async (event: any) => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify(mailgunResponse),
+            body: JSON.stringify(emailEvent),
             headers: corsHeaders
         };
     } catch (error) {
