@@ -34,9 +34,9 @@ export const getEmailTemplate = (senderName: string | undefined, recipientName: 
         <br><br>
         Someone's gotten in touch about your ask/offer of help on helpful neighbours! Here's their message:
         <br><br>
-        ${message}
+        <i>"${message}"</i>
         <br><br>
-        Get in touch with ${senderName ? senderName : "them"} at ${email}.
+        Get in touch with ${senderName ? senderName : "them"} at <strong>${email}</strong>.
         <br><br>
         Cheers!
         </p>
