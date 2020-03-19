@@ -19,6 +19,7 @@ interface Listing {
     longitude: string,
     postcode: string,
     state: string,
+    address: string,
     timestamp: number,
     type: string,
 }
@@ -30,6 +31,7 @@ interface ListingPostData {
     longitude: string,
     postcode: string,
     state: string,
+    address: string,
     type: string,
     name: string,
 }
