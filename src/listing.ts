@@ -40,6 +40,7 @@ const corsHeaders = {
 }
 
 const postListing = async (body: ListingPostData) => {
+    logger.info({body}, "Posting Listing")
     const listingItem: Listing = {
         ...body,
         id: uuidv4(),
@@ -57,13 +58,25 @@ const postListing = async (body: ListingPostData) => {
 const getListings = async () => {
     const items = await allItems(LISTING_DDB_TABLE, logger)
 
-    // TODO: don't return emails
+    if (items) {
+        // don't return emails for security reasons
+        const emailRemovedItems = items.map((item) => {
+            delete item.email
+            return item
+        })
 
-    return {
-        statusCode: 200,
-        body: JSON.stringify(items),
-        headers: corsHeaders
-    };
+        return {
+            statusCode: 200,
+            body: JSON.stringify(emailRemovedItems),
+            headers: corsHeaders
+        };
+    } else {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({"error": "error fetching listings"}),
+            headers: corsHeaders
+        };
+    }
 }
 
 export const handler = async (event: any) => {
