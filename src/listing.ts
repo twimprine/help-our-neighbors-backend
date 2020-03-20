@@ -21,7 +21,7 @@ interface Listing {
     state: string,
     address: string,
     timestamp: number,
-    type: string,
+    listingType: string,
 }
 
 interface ListingPostData {
@@ -32,7 +32,7 @@ interface ListingPostData {
     postcode: string,
     state: string,
     address: string,
-    type: string,
+    listingType: string,
     name: string,
 }
 
@@ -57,8 +57,19 @@ const postListing = async (body: ListingPostData) => {
     };
 }
 
-const getListings = async () => {
-    const items = await allItems(LISTING_DDB_TABLE, logger)
+const getListings = async (event: any) => {
+
+    // Check if filter used
+    let filterExpr
+    if (event.queryStringParameters && event.queryStringParameters.type_filter) {
+        filterExpr = {
+            FilterExpression : 'listingType = :listingType',
+            ExpressionAttributeValues : {':listingType' : event.queryStringParameters.type_filter}
+        }
+        logger.info({filterExpr}, "Applying filter expression to scan")
+    }
+
+    const items = await allItems(LISTING_DDB_TABLE, logger, filterExpr)
 
     if (items) {
         // don't return emails for security reasons
@@ -87,7 +98,7 @@ export const handler = async (event: any) => {
 
     switch(httpMethod) {
         case "GET":
-            return  await getListings()
+            return  await getListings(event)
         case "POST":
             const body = JSON.parse(event.body)
             return await postListing(body)

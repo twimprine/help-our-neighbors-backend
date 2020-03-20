@@ -14,12 +14,16 @@ export const storeItem = async (tableName: string, item: any, logger: any) => {
     }
 }
 
-export const allItems = async (tableName: string, logger: any) => {
+export const allItems = async (tableName: string, logger: any, filterExpression?: any) => {
     const DDB = new DynamoDB.DocumentClient()
     try {
         const dbParams: AWS.DynamoDB.DocumentClient.ScanInput = {
             TableName: tableName,
             Select: "ALL_ATTRIBUTES"
+        }
+        if (filterExpression) {
+            dbParams.FilterExpression = filterExpression.FilterExpression
+            dbParams.ExpressionAttributeValues = filterExpression.ExpressionAttributeValues
         }
         const response = await DDB.scan(dbParams).promise()
         logger.info({response}, "Scanned all items in DynamoDB")
