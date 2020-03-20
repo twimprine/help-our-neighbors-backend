@@ -37,6 +37,7 @@ paths:
       - listing
       parameters:
         - $ref: '#/components/parameters/type_filter'
+        - $ref: '#/components/parameters/state_filter'
       responses:
         '200':
           description: list of listings
@@ -78,7 +79,15 @@ components:
       example: offer
       schema:
         type: string
-        format: uuid
+
+    state_filter:
+      name: state_filter
+      in: query
+      description: state a listing is in
+      required: false
+      example: VIC
+      schema:
+        type: string
 
   schemas:
     
@@ -169,7 +178,7 @@ components:
         postcode:
           type: string
           example: "3000"
-        state:
+        listingState:
           type: string
           example: VIC
         address:
@@ -212,7 +221,7 @@ components:
         postcode:
           type: string
           example: "3000"
-        state:
+        listingState:
           type: string
           example: VIC
         address:
@@ -251,7 +260,7 @@ components:
         postcode:
           type: string
           example: 3000
-        state:
+        listingState:
           type: string
           example: VIC
         address:
