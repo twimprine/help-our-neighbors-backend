@@ -110,3 +110,13 @@ Resources:
           Properties:
             Path: /listings
             Method: get
+        ListingsOfferGet:
+          Type: Api
+          Properties:
+            Path: /listings/offer
+            Method: get
+        ListingsRequestGet:
+          Type: Api
+          Properties:
+            Path: /listings/request
+            Method: get

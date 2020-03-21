@@ -90,13 +90,57 @@ const getListings = async (event: any) => {
     }
 }
 
+const getListingsPaginated = async (event: any, listingType: string) => {
+    const qs = event.queryStringParameters
+    const state_filter = qs ? qs.state_filter : undefined
+    const items = await queryListingsByType(LISTING_DDB_TABLE, listingType, logger, state_filter)
+
+    if (items) {
+        // don't return emails for security reasons
+        const emailRemovedItems = items.map((item: any) => {
+            delete item.email
+            return item
+        })
+
+        const paginatedResponse = {
+            items: emailRemovedItems,
+            nextToken: null 
+        }
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify(paginatedResponse),
+            headers: corsHeaders
+        };
+    } else {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({"error": "error fetching listings"}),
+            headers: corsHeaders
+        };
+    }
+}
+
 export const handler = async (event: any) => {
     logger.info({event}, "Listing lambda event");
     const httpMethod: HttpMethod = event.httpMethod
 
     switch(httpMethod) {
         case "GET":
-            return  await getListings(event)
+            if (event.path === "/listings") {
+                return  await getListings(event)
+            }
+            if (event.path === "/listings/offer") {
+                return  await getListingsPaginated(event, "offer")
+            }
+            if (event.path === "/listings/request") {
+                return  await getListingsPaginated(event, "request")
+            }
+            return {
+                statusCode: 500,
+                body: JSON.stringify({"error": "method not supported"}),
+                headers: corsHeaders
+            };
         case "POST":
             const body = JSON.parse(event.body)
             return await postListing(body)

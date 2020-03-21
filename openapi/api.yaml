@@ -67,10 +67,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Listing'
+                
+  /listings/offer:
+    get:
+      summary: Returns a paginated array of listings. Use nextToken to get next page.
+      operationId: ReadListingOffers
+      description: Returns a paginated array of listings. Use nextToken to get next page.
+      tags:
+      - listing
+      parameters:
+        - $ref: '#/components/parameters/next_token'
+        - $ref: '#/components/parameters/state_filter'
+      responses:
+        '200':
+          description: paginated array of listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaginatedListings'
+  
+  /listings/request:
+    get:
+      summary: Returns a paginated array of listings. Use nextToken to get next page.
+      operationId: ReadListingRequests
+      description: Returns a paginated array of listings. Use nextToken to get next page.
+      tags:
+      - listing
+      parameters:
+        - $ref: '#/components/parameters/next_token'
+        - $ref: '#/components/parameters/state_filter'
+      responses:
+        '200':
+          description: paginated array of listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaginatedListings'
 
 components:
 
   parameters:
+  
+    next_token:
+      name: next_token
+      in: query
+      description: pagination token
+      required: false
+      example: offer
+      schema:
+        type: string
+  
     type_filter:
       name: type_filter
       in: query
@@ -233,7 +283,23 @@ components:
         timestamp:
           format: date-time
           description: The timestamp the listing was created
-    
+          
+    PaginatedListings:
+      description: PaginatedListings.
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadListing'
+        nextToken:
+          type: string
+          example: VGhpcyBpcyBhbiBleGFtcGxlIG5leHRUb2tlbiB2YWx1ZQ==
+          nullable: true
+          description: null when there are no more items to fetch
+      
     CreateListing:
       description: Payload to create a Listing.
       type: object
