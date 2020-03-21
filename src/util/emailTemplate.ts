@@ -5,7 +5,7 @@ export const getEmailTemplate = (senderName: string | undefined, recipientName: 
         xmlns:v="urn:schemas-microsoft-com:vml"
         xmlns:o="urn:schemas-microsoft-com:office:office">
         <head>
-        <title>Plastic</title>
+        <title>Helpful Neighbours</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0 " />
@@ -27,7 +27,7 @@ export const getEmailTemplate = (senderName: string | undefined, recipientName: 
 
         </style>
         </head>
-        <body bgcolor="#FFFF00" class="em_body" style="margin:0px auto; padding:0px;">
+        <body class="em_body" style="margin:0px auto; padding:0px;">
        <div>
         <p>
         Hi ${recipientName},
