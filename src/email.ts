@@ -3,7 +3,7 @@
 import bunyan from 'bunyan'
 import Mailgun from 'mailgun-js'
 import { getItem, storeItem } from "./util/dynamodb"
-import { getEmailTemplate } from "./util/emailTemplate"
+import { getReplyToOfferEmailTemplate, getReplyToOfferConfirmationEmailTemplate } from "./util/emailTemplates"
 
 const MAIL_GUN_API_KEY = process.env.MAIL_GUN_API_KEY ||  ""
 const DOMAIN = process.env.DOMAIN || ""
@@ -25,6 +25,18 @@ interface EmailPostData {
     message: string,
 }
 
+const sendConfirmationEmail = async (mailgun: any, fromEmail: string, senderName: string, recipientName: string) => {
+    const formattedEmail = getReplyToOfferConfirmationEmailTemplate(senderName, recipientName)
+    var data = {
+        from: `Helpful Neighbours <${HELPFUL_NEIGHBOURS_EMAIL}>`,
+        to: fromEmail,
+        subject: 'Offer to Help Confirmation',
+        html: formattedEmail
+    }
+    const mailgunResponse = await mailgun.messages().send(data);
+    logger.info({response: mailgunResponse}, "Mailgun response for confirmation email");
+}
+ 
 export const handler = async (event: any) => {
     logger.info({event}, "Email lambda event");
 
@@ -54,7 +66,7 @@ export const handler = async (event: any) => {
     });
     logger.info({mailgun}, `Mailgun initialized. Sending email to: ${listing.email}`);
 
-    const formattedEmail = getEmailTemplate(body.name, listing.name, body.message, body.fromEmail)
+    const formattedEmail = getReplyToOfferEmailTemplate(body.name, listing.name, body.message, body.fromEmail)
 
     var data = {
         from: `Helpful Neighbours <${HELPFUL_NEIGHBOURS_EMAIL}>`,
@@ -79,6 +91,13 @@ export const handler = async (event: any) => {
         }
         // Save email event in DynamoDB
         await storeItem(EMAIL_DDB_TABLE, emailEvent, logger)
+
+        // Send confirmation email. Fail silently     
+        try {
+            await sendConfirmationEmail(mailgun, body.fromEmail, body.name!, listing.name)
+        } catch (err) {
+            logger.error({error: err}, "Failed to send confirmation email");
+        }
 
         return {
             statusCode: 200,
