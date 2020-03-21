@@ -27,6 +27,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmailResponse'
+                
+  /listings/{id}:
+    delete:
+      summary: Delete a listing
+      operationId: DeleteListing
+      description: Deletes a listing if a valid secretToken is provided
+      tags:
+      - listing
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/secret_token'
+      responses:
+        '200':
+          description: listing delete response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadListing'
+        '404':
+          description: The listing does not exist.
 
   /listings:
     get:
@@ -109,9 +129,25 @@ paths:
                   $ref: '#/components/schemas/PaginatedListings'
 
 components:
-
   parameters:
-  
+    id:
+      name: id
+      in: path
+      description: Identifier of listing
+      required: true
+      example: 1ce90bf8-2029-49dc-8aa6-d959ce92fa9b
+      schema:
+        type: string
+        format: uuid
+    secret_token:
+      name: secret_token
+      in: query
+      description: secret token used to delete a listing
+      required: true
+      example: 1ce90bf8-2029-49dc-8aa6-d959ce92fa9b
+      schema:
+        type: string
+        format: uuid
     next_token:
       name: next_token
       in: query
@@ -120,7 +156,6 @@ components:
       example: offer
       schema:
         type: string
-  
     type_filter:
       name: type_filter
       in: query
@@ -129,7 +164,6 @@ components:
       example: offer
       schema:
         type: string
-
     state_filter:
       name: state_filter
       in: query
@@ -240,6 +274,11 @@ components:
         timestamp:
           format: date-time
           description: The timestamp the listing was created
+        secretToken:
+          type: string
+          format: uuid
+          description: Token used to delete a listing
+          example: 1ce90bf8-2029-49dc-8aa6-d959ce92fa9b
     
     ReadListing:
       description: Listing response. Email is not returned.
@@ -250,7 +289,7 @@ components:
         - latitude
         - longitude
         - postcode
-        - state
+        - listingState
         - name
         - timestamp
         - listingType
@@ -274,8 +313,6 @@ components:
         listingState:
           type: string
           example: VIC
-        address:
-          type: string
         listingType:
           type: string
         name:
@@ -296,7 +333,7 @@ components:
             $ref: '#/components/schemas/ReadListing'
         nextToken:
           type: string
-          example: VGhpcyBpcyBhbiBleGFtcGxlIG5leHRUb2tlbiB2YWx1ZQ==
+          example: null
           nullable: true
           description: null when there are no more items to fetch
       
@@ -309,7 +346,7 @@ components:
         - latitude
         - longitude
         - postcode
-        - state
+        - listingState
         - name
         - listingType
       properties:
@@ -335,4 +372,3 @@ components:
           type: string
         name:
           type: string
-
