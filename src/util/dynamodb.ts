@@ -14,16 +14,12 @@ export const storeItem = async (tableName: string, item: any, logger: any) => {
     }
 }
 
-export const allItems = async (tableName: string, logger: any, filterExpression?: any) => {
+export const scanAllItems = async (tableName: string, logger: any) => {
     const DDB = new DynamoDB.DocumentClient()
     try {
         const dbParams: AWS.DynamoDB.DocumentClient.ScanInput = {
             TableName: tableName,
             Select: "ALL_ATTRIBUTES"
-        }
-        if (filterExpression) {
-            dbParams.FilterExpression = filterExpression.FilterExpression
-            dbParams.ExpressionAttributeValues = filterExpression.ExpressionAttributeValues
         }
         const response = await DDB.scan(dbParams).promise()
         logger.info({response}, "Scanned all items in DynamoDB")
@@ -47,5 +43,29 @@ export const getItem = async (tableName: string, itemId: string, logger: any) =>
         return data.Item;
       } catch (error) {
         logger.error({error}, "Error retrieving item from DynamoDB");
+    }
+}
+
+export const queryListingsByType = async (tableName: string, listingType: string, logger: any, stateFilter?: string) => {
+    const DDB = new DynamoDB.DocumentClient()
+    const dbParams: DynamoDB.DocumentClient.QueryInput = {
+        TableName: tableName,
+        IndexName: "gsi_listingType",
+        KeyConditionExpression: 'listingType = :key',
+        ExpressionAttributeValues: {':key': listingType}
+    };
+
+    if (stateFilter) {
+        dbParams.FilterExpression = 'listingState = :listingState',
+        dbParams.ExpressionAttributeValues![':listingState'] = stateFilter
+    }
+    logger.info({dbParams})
+
+    try {
+        const data = await DDB.query(dbParams).promise();
+        logger.info('Successfully got items:', data.Items);
+        return data.Items;
+      } catch (error) {
+        logger.error({error}, "Error retrieving items from DynamoDB");
     }
 }

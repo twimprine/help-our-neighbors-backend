@@ -1,7 +1,7 @@
 'use strict'
 
 import bunyan from 'bunyan'
-import { allItems, storeItem } from "./util/dynamodb"
+import { queryListingsByType, scanAllItems, storeItem } from "./util/dynamodb"
 import { v4 as uuidv4 } from 'uuid';
 
 const LISTING_DDB_TABLE = process.env.LISTING_DDB_TABLE || ''
@@ -57,48 +57,21 @@ const postListing = async (body: ListingPostData) => {
     };
 }
 
-const buildListingsFilterExpr = (event: any) => {
-    const qs = event.queryStringParameters
-    if (qs) {
-        if (qs.type_filter && !qs.state_filter) {
-            logger.info({qs}, "Filter with type, no state")
-            return {
-                FilterExpression : 'listingType = :listingType',
-                ExpressionAttributeValues : {':listingType' : qs.type_filter}
-            }
-        }
-        // state but not type
-        if (!qs.type_filter && qs.state_filter) {
-            logger.info({qs}, "Filter with state, no type")
-            return {
-                FilterExpression : 'listingState = :listingState',
-                ExpressionAttributeValues : {':listingState': qs.state_filter}
-            }
-        }
-        // both type and state
-        if (qs.type_filter && qs.state_filter) {
-            logger.info({qs}, "Filter with type and state")
-            return {
-                FilterExpression : 'listingType = :listingType AND listingState = :listingState',
-                ExpressionAttributeValues : {':listingType' : qs.type_filter, ':listingState': qs.state_filter}
-            }
-        }
-    }
-}
-
 const getListings = async (event: any) => {
 
-    // undefined when no 'queryStringParameters' passed 
-    const filterExpr = buildListingsFilterExpr(event)
-    if (filterExpr) {
-        logger.info({filterExpr}, "Applying filter expression to scan")
+    // Use Global Secondary Index when filter params given. Most requests filter by `listingType`
+    let items
+    const qs = event.queryStringParameters
+    if (qs) {
+        items = await queryListingsByType(LISTING_DDB_TABLE, qs.type_filter, logger, qs.state_filter)
+    } else {
+        logger.info("No Query Strings. Performing DDB scan")
+        items = await scanAllItems(LISTING_DDB_TABLE, logger)
     }
-
-    const items = await allItems(LISTING_DDB_TABLE, logger, filterExpr)
 
     if (items) {
         // don't return emails for security reasons
-        const emailRemovedItems = items.map((item) => {
+        const emailRemovedItems = items.map((item: any) => {
             delete item.email
             return item
         })

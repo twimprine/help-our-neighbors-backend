@@ -66,9 +66,22 @@ Resources:
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
+        - AttributeName: listingType
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
       KeySchema:
         - AttributeName: id
           KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: gsi_listingType
+          KeySchema:
+            - AttributeName: listingType
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
       SSESpecification:
         SSEEnabled: true
