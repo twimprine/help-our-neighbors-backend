@@ -18,10 +18,11 @@ interface Listing {
     latitude: string,
     longitude: string,
     postcode: string,
-    state: string,
+    listingState: string,
     address: string,
     timestamp: number,
     listingType: string,
+    secretToken: string,
 }
 
 interface ListingPostData {
@@ -30,7 +31,7 @@ interface ListingPostData {
     latitude: string,
     longitude: string,
     postcode: string,
-    state: string,
+    listingState: string,
     address: string,
     listingType: string,
     name: string,
@@ -46,6 +47,7 @@ const postListing = async (body: ListingPostData) => {
     const listingItem: Listing = {
         ...body,
         id: uuidv4(),
+        secretToken: uuidv4(),
         timestamp: new Date().getTime(),   
     }
     await storeItem(LISTING_DDB_TABLE, listingItem, logger)
@@ -71,14 +73,15 @@ const getListings = async (event: any) => {
 
     if (items) {
         // don't return emails for security reasons
-        const emailRemovedItems = items.map((item: any) => {
+        const cleanedItems = items.map((item: any) => {
             delete item.email
+            delete item.address
             return item
         })
 
         return {
             statusCode: 200,
-            body: JSON.stringify(emailRemovedItems),
+            body: JSON.stringify(cleanedItems),
             headers: corsHeaders
         };
     } else {
@@ -97,13 +100,14 @@ const getListingsPaginated = async (event: any, listingType: string) => {
 
     if (items) {
         // don't return emails for security reasons
-        const emailRemovedItems = items.map((item: any) => {
+        const cleanedItems = items.map((item: any) => {
             delete item.email
+            delete item.address
             return item
         })
 
         const paginatedResponse = {
-            items: emailRemovedItems,
+            items: cleanedItems,
             nextToken: null 
         }
 
