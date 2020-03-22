@@ -8,7 +8,7 @@ const LISTING_DDB_TABLE = process.env.LISTING_DDB_TABLE || ''
 
 const logger = bunyan.createLogger({name: "listing-lambda"})
 
-type HttpMethod = "POST" | "GET"
+type HttpMethod = "POST" | "GET" | "DELETE"
 
 interface Listing {
     id: string,
@@ -25,6 +25,19 @@ interface Listing {
     secretToken: string,
 }
 
+interface ReadListing {
+    id: string,
+    message: string,
+    name: string,
+    latitude: string,
+    longitude: string,
+    postcode: string,
+    listingState: string,
+    timestamp: number,
+    listingType: string,
+}
+
+
 interface ListingPostData {
     email: string,
     message: string,
@@ -40,6 +53,19 @@ interface ListingPostData {
 // Needed for CORS with Proxy-lambda integration
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*"
+}
+
+const cleanListing = (listing: Listing): ReadListing => {
+    if (listing.email) {
+        delete listing.email
+    }
+    if (listing.address) {
+        delete listing.address
+    }
+    if (listing.secretToken) {
+        delete listing.secretToken
+    }
+    return listing
 }
 
 const postListing = async (body: ListingPostData) => {
@@ -72,12 +98,8 @@ const getListings = async (event: any) => {
     }
 
     if (items) {
-        // don't return emails for security reasons
-        const cleanedItems = items.map((item: any) => {
-            delete item.email
-            delete item.address
-            return item
-        })
+        // don't return emails and address for security reasons
+        const cleanedItems = items.map((item: any) => { return cleanListing(item) })
 
         return {
             statusCode: 200,
@@ -99,12 +121,8 @@ const getListingsPaginated = async (event: any, listingType: string) => {
     const items = await queryListingsByType(LISTING_DDB_TABLE, listingType, logger, state_filter)
 
     if (items) {
-        // don't return emails for security reasons
-        const cleanedItems = items.map((item: any) => {
-            delete item.email
-            delete item.address
-            return item
-        })
+        // don't return emails and address for security reasons
+        const cleanedItems = items.map((item: any) => { return cleanListing(item) })
 
         const paginatedResponse = {
             items: cleanedItems,
@@ -123,6 +141,24 @@ const getListingsPaginated = async (event: any, listingType: string) => {
             headers: corsHeaders
         };
     }
+}
+
+const deleteListing = async (event: any) => {
+    logger.info({event}, "Deleting listing")
+    const deletedListing = {}
+    const cleanedListing = cleanListing(deletedListing as Listing)
+    return {
+        statusCode: 200,
+        body: JSON.stringify(cleanedListing),
+        headers: corsHeaders
+    };
+    // } else {
+    //     return {
+    //         statusCode: 500,
+    //         body: JSON.stringify({"error": "error fetching listings"}),
+    //         headers: corsHeaders
+    //     };
+    // }
 }
 
 export const handler = async (event: any) => {
@@ -148,6 +184,8 @@ export const handler = async (event: any) => {
         case "POST":
             const body = JSON.parse(event.body)
             return await postListing(body)
+        case "DELETE":
+            return await deleteListing(event)
         default:
             return {
                 statusCode: 500,
