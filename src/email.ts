@@ -3,13 +3,13 @@
 import bunyan from 'bunyan'
 import Mailgun from 'mailgun-js'
 import { getItem, storeItem } from "./util/dynamodb"
-import { getReplyToOfferEmailTemplate, getReplyToOfferConfirmationEmailTemplate } from "./util/emailTemplates"
+import { HELPFUL_NEIGHBOURS_EMAIL, sendOfferConfirmationEmail } from "./util/email"
+import { getReplyToOfferEmailTemplate } from "./util/emailTemplates"
 
 const MAIL_GUN_API_KEY = process.env.MAIL_GUN_API_KEY ||  ""
 const DOMAIN = process.env.DOMAIN || ""
 const EMAIL_DDB_TABLE = process.env.EMAIL_DDB_TABLE || ''
 const LISTING_DDB_TABLE = process.env.LISTING_DDB_TABLE || ''
-const HELPFUL_NEIGHBOURS_EMAIL = "info@helpfulneighbours.com.au"
 
 const logger = bunyan.createLogger({name: "email-lambda"})
 
@@ -25,18 +25,6 @@ interface EmailPostData {
     message: string,
 }
 
-const sendConfirmationEmail = async (mailgun: any, fromEmail: string, senderName: string, recipientName: string) => {
-    const formattedEmail = getReplyToOfferConfirmationEmailTemplate(senderName, recipientName)
-    var data = {
-        from: `Helpful Neighbours <${HELPFUL_NEIGHBOURS_EMAIL}>`,
-        to: fromEmail,
-        subject: 'Offer to Help Confirmation',
-        html: formattedEmail
-    }
-    const mailgunResponse = await mailgun.messages().send(data);
-    logger.info({response: mailgunResponse}, "Mailgun response for confirmation email");
-}
- 
 export const handler = async (event: any) => {
     logger.info({event}, "Email lambda event");
 
@@ -94,7 +82,8 @@ export const handler = async (event: any) => {
 
         // Send confirmation email. Fail silently     
         try {
-            await sendConfirmationEmail(mailgun, body.fromEmail, body.name!, listing.name)
+            const confirmationResponse = await sendOfferConfirmationEmail(mailgun, body.fromEmail, body.name!, listing.name)
+            logger.info({response: confirmationResponse}, "Mailgun response for confirmation email");
         } catch (err) {
             logger.error({error: err}, "Failed to send confirmation email");
         }

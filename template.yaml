@@ -106,6 +106,8 @@ Resources:
       Environment:
         Variables:
           LISTING_DDB_TABLE: !Ref ListingTable
+          MAIL_GUN_API_KEY: !Ref MailGunApiKey
+          DOMAIN: !Ref Domain
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ListingTable

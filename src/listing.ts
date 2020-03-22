@@ -1,10 +1,14 @@
 'use strict'
 
 import bunyan from 'bunyan'
+import Mailgun from 'mailgun-js'
 import { deleteItem, getItem, queryListingsByType, scanAllItems, storeItem } from "./util/dynamodb"
+import { sendListingConfirmationEmail } from "./util/email"
 import { v4 as uuidv4 } from 'uuid';
 
 const LISTING_DDB_TABLE = process.env.LISTING_DDB_TABLE || ''
+const MAIL_GUN_API_KEY = process.env.MAIL_GUN_API_KEY ||  ""
+const DOMAIN = process.env.DOMAIN || ""
 
 const logger = bunyan.createLogger({name: "listing-lambda"})
 
@@ -69,7 +73,7 @@ const cleanListing = (listing: Listing): ReadListing => {
 }
 
 const postListing = async (body: ListingPostData) => {
-    logger.info({body}, "Posting Listing")
+    logger.info({body}, "Creating Listing")
     const listingItem: Listing = {
         ...body,
         id: uuidv4(),
@@ -77,6 +81,21 @@ const postListing = async (body: ListingPostData) => {
         timestamp: new Date().getTime(),   
     }
     await storeItem(LISTING_DDB_TABLE, listingItem, logger)
+    logger.info({listingItem}, "Created listing");
+
+    // Send confirmation email
+    try {
+        const mailgun = new Mailgun({
+            apiKey: MAIL_GUN_API_KEY,
+            domain: DOMAIN
+        });
+        logger.info({mailgun}, `Mailgun initialized. Sending email to: ${listingItem.email}`);
+
+        const mailgunResponse = await sendListingConfirmationEmail(mailgun, listingItem.email, listingItem.name, listingItem.secretToken)
+        logger.info({mailgunResponse}, "Successfully sent confirmation email for listing creation");
+    } catch (error) {
+        logger.error({error}, "Error sending confirmation email for listing creation");
+    }
 
     return {
         statusCode: 201,
