@@ -1,7 +1,7 @@
 'use strict'
 
 import bunyan from 'bunyan'
-import { queryListingsByType, scanAllItems, storeItem } from "./util/dynamodb"
+import { deleteItem, getItem, queryListingsByType, scanAllItems, storeItem } from "./util/dynamodb"
 import { v4 as uuidv4 } from 'uuid';
 
 const LISTING_DDB_TABLE = process.env.LISTING_DDB_TABLE || ''
@@ -144,21 +144,54 @@ const getListingsPaginated = async (event: any, listingType: string) => {
 }
 
 const deleteListing = async (event: any) => {
-    logger.info({event}, "Deleting listing")
-    const deletedListing = {}
-    const cleanedListing = cleanListing(deletedListing as Listing)
+    // Assert ID provided
+    if (!event.pathParameters) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({"error": "no id to delete provided"}),
+            headers: corsHeaders
+        };
+    }
+
+    // Assert secret_token provided
+    if (!event.queryStringParameters || !event.queryStringParameters.secret_token) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({"error": "no secret_token provided"}),
+            headers: corsHeaders
+        };
+    }
+
+    const secretToken = event.queryStringParameters.secret_token
+    const listingId = event.pathParameters.id
+
+    const listing = await getItem(LISTING_DDB_TABLE, listingId, logger)
+    logger.info({listing}, "Retrieved Listing");
+    if (!listing) {
+        return {
+            statusCode: 404,
+            body: JSON.stringify({"message": `No listing found for id: ${listingId}`}),
+            headers: corsHeaders
+        };
+    };
+
+    if (listing.secretToken && listing.secretToken !== secretToken) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({"message": "Invalid secret_token value to delete listing"}),
+            headers: corsHeaders
+        };
+    };
+
+    await deleteItem(LISTING_DDB_TABLE, listingId)
+    logger.info({listing}, "Deleted Listing");
+
+    const cleanedListing = cleanListing(listing as Listing)
     return {
         statusCode: 200,
         body: JSON.stringify(cleanedListing),
         headers: corsHeaders
     };
-    // } else {
-    //     return {
-    //         statusCode: 500,
-    //         body: JSON.stringify({"error": "error fetching listings"}),
-    //         headers: corsHeaders
-    //     };
-    // }
 }
 
 export const handler = async (event: any) => {

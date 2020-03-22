@@ -32,7 +32,7 @@ paths:
     delete:
       summary: Delete a listing
       operationId: DeleteListing
-      description: Deletes a listing if a valid secretToken is provided
+      description: Deletes a listing if a valid secret_token is provided
       tags:
       - listing
       parameters:
@@ -45,6 +45,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReadListing'
+        '400':
+          description: Invalid secret_token provided to delete listing.
         '404':
           description: The listing does not exist.
 

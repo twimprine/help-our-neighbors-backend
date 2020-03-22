@@ -46,6 +46,17 @@ export const getItem = async (tableName: string, itemId: string, logger: any) =>
     }
 }
 
+export const deleteItem = async (tableName: string, itemId: string) => {
+    const DDB = new DynamoDB.DocumentClient()
+    const dbParams: DynamoDB.DocumentClient.DeleteItemInput = {
+        TableName: tableName,
+        Key: {
+            "id": itemId
+        }
+    };
+    return await DDB.delete(dbParams).promise();
+}
+
 export const queryListingsByType = async (tableName: string, listingType: string, logger: any, stateFilter?: string) => {
     const DDB = new DynamoDB.DocumentClient()
     const dbParams: DynamoDB.DocumentClient.QueryInput = {
