@@ -71,12 +71,5 @@ export const queryListingsByType = async (tableName: string, listingType: string
         dbParams.ExpressionAttributeValues![':listingState'] = stateFilter
     }
     logger.info({dbParams})
-
-    try {
-        const data = await DDB.query(dbParams).promise();
-        logger.info('Successfully got items:', data.Items);
-        return data.Items;
-      } catch (error) {
-        logger.error({error}, "Error retrieving items from DynamoDB");
-    }
+    return await DDB.query(dbParams).promise();
 }

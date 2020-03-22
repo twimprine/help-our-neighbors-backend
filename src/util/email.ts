@@ -13,8 +13,8 @@ export const sendOfferConfirmationEmail = async (mailgun: any, fromEmail: string
     return await mailgun.messages().send(data);
 }
 
-export const sendListingConfirmationEmail = async (mailgun: any, email: string, name: string, secretToken: string) => {
-    const formattedEmail = getListingConfirmationEmailTemplate(name, secretToken)
+export const sendListingConfirmationEmail = async (mailgun: any, listingId: string, email: string, name: string, secretToken: string) => {
+    const formattedEmail = getListingConfirmationEmailTemplate(name, listingId, secretToken)
     var data = {
         from: `Helpful Neighbours <${HELPFUL_NEIGHBOURS_EMAIL}>`,
         to: email,

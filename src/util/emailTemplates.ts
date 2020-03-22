@@ -68,7 +68,7 @@ export const getReplyToOfferConfirmationEmailTemplate = (senderName: string, rec
         `
     }
 
-export const getListingConfirmationEmailTemplate = (name: string, secretToken: string) => {
+export const getListingConfirmationEmailTemplate = (name: string, listingId: string, secretToken: string) => {
     return `
         ${HTML_HEADERS}
         <body class="em_body" style="margin:0px auto; padding:0px;">
@@ -78,7 +78,9 @@ export const getListingConfirmationEmailTemplate = (name: string, secretToken: s
         <br><br>
         We've added your ask/offer of help on helpful neighbours.
         <br><br>
-        You can provide this token if you decide to remove your listing later: <strong>${secretToken}</strong>
+        This link can be used to remove your listing at any time:
+        <br>
+        https://www.helpfulneighbours.com/delete-listing?secretToken=${secretToken}&listingId=${listingId}
         <br><br>
         Cheers!
         </p>

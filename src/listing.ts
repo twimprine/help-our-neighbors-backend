@@ -91,7 +91,7 @@ const postListing = async (body: ListingPostData) => {
         });
         logger.info({mailgun}, `Mailgun initialized. Sending email to: ${listingItem.email}`);
 
-        const mailgunResponse = await sendListingConfirmationEmail(mailgun, listingItem.email, listingItem.name, listingItem.secretToken)
+        const mailgunResponse = await sendListingConfirmationEmail(mailgun, listingItem.id, listingItem.email, listingItem.name, listingItem.secretToken)
         logger.info({mailgunResponse}, "Successfully sent confirmation email for listing creation");
     } catch (error) {
         logger.error({error}, "Error sending confirmation email for listing creation");
@@ -110,12 +110,13 @@ const getListings = async (event: any) => {
     let items
     const qs = event.queryStringParameters
     if (qs) {
-        items = await queryListingsByType(LISTING_DDB_TABLE, qs.type_filter, logger, qs.state_filter)
+        const data = await queryListingsByType(LISTING_DDB_TABLE, qs.type_filter, logger, qs.state_filter)
+        logger.info({data}, "Queried listing by type")
+        items = data.Items
     } else {
         logger.info("No Query Strings. Performing DDB scan")
         items = await scanAllItems(LISTING_DDB_TABLE, logger)
     }
-
     if (items) {
         // don't return emails and address for security reasons
         const cleanedItems = items.map((item: any) => { return cleanListing(item) })
@@ -137,7 +138,9 @@ const getListings = async (event: any) => {
 const getListingsPaginated = async (event: any, listingType: string) => {
     const qs = event.queryStringParameters
     const state_filter = qs ? qs.state_filter : undefined
-    const items = await queryListingsByType(LISTING_DDB_TABLE, listingType, logger, state_filter)
+    const data = await queryListingsByType(LISTING_DDB_TABLE, listingType, logger, state_filter)
+    logger.info({data}, "Queried listing by type")
+    const items = data.Items
 
     if (items) {
         // don't return emails and address for security reasons
