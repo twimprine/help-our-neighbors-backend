@@ -68,6 +68,8 @@ Resources:
           AttributeType: S
         - AttributeName: listingType
           AttributeType: S
+        - AttributeName: email
+          AttributeType: S
         - AttributeName: timestamp
           AttributeType: N
       KeySchema:
@@ -77,6 +79,14 @@ Resources:
         - IndexName: gsi_listingType
           KeySchema:
             - AttributeName: listingType
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: gsi_email
+          KeySchema:
+            - AttributeName: email
               KeyType: HASH
             - AttributeName: timestamp
               KeyType: RANGE
