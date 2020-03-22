@@ -4,6 +4,7 @@ import bunyan from 'bunyan'
 import Mailgun from 'mailgun-js'
 import { deleteItem, getItem, queryListingsByType, scanAllItems, storeItem } from "./util/dynamodb"
 import { sendListingConfirmationEmail } from "./util/email"
+import { getNextToken, parseNextToken } from "./util/pagination"
 import { v4 as uuidv4 } from 'uuid';
 
 const LISTING_DDB_TABLE = process.env.LISTING_DDB_TABLE || ''
@@ -41,6 +42,10 @@ interface ReadListing {
     listingType: string,
 }
 
+interface PaginatedListings {
+    items: ReadListing[],
+    nextToken: string | null
+}
 
 interface ListingPostData {
     email: string,
@@ -137,8 +142,10 @@ const getListings = async (event: any) => {
 
 const getListingsPaginated = async (event: any, listingType: string) => {
     const qs = event.queryStringParameters
-    const state_filter = qs ? qs.state_filter : undefined
-    const data = await queryListingsByType(LISTING_DDB_TABLE, listingType, logger, state_filter)
+    const stateFilter = qs ? qs.state_filter : undefined
+    const nextToken = qs && qs.next_token ? parseNextToken(qs.next_token) : undefined
+
+    const data = await queryListingsByType(LISTING_DDB_TABLE, listingType, logger, stateFilter, nextToken)
     logger.info({data}, "Queried listing by type")
     const items = data.Items
 
@@ -146,9 +153,9 @@ const getListingsPaginated = async (event: any, listingType: string) => {
         // don't return emails and address for security reasons
         const cleanedItems = items.map((item: any) => { return cleanListing(item) })
 
-        const paginatedResponse = {
+        const paginatedResponse: PaginatedListings = {
             items: cleanedItems,
-            nextToken: null 
+            nextToken: getNextToken(data.LastEvaluatedKey) 
         }
 
         return {

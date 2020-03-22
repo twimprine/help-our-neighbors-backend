@@ -57,7 +57,7 @@ export const deleteItem = async (tableName: string, itemId: string) => {
     return await DDB.delete(dbParams).promise();
 }
 
-export const queryListingsByType = async (tableName: string, listingType: string, logger: any, stateFilter?: string) => {
+export const queryListingsByType = async (tableName: string, listingType: string, logger: any, stateFilter?: string, nextToken?: any) => {
     const DDB = new DynamoDB.DocumentClient()
     const dbParams: DynamoDB.DocumentClient.QueryInput = {
         TableName: tableName,
@@ -65,6 +65,10 @@ export const queryListingsByType = async (tableName: string, listingType: string
         KeyConditionExpression: 'listingType = :key',
         ExpressionAttributeValues: {':key': listingType}
     };
+
+    if (nextToken) {
+        dbParams.ExclusiveStartKey = nextToken
+    }
 
     if (stateFilter) {
         dbParams.FilterExpression = 'listingState = :listingState',
