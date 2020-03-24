@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   title: helpful-neighbours
-  description: An API for Helpful Neighbours. API Key auth.
+  description: An API for Helpful Neighbours https://www.helpfulneighbours.com.au/. Uses API Key Authorization.
   version: 2019-11-07
 
 paths:
@@ -220,11 +220,13 @@ components:
         - latitude
         - longitude
         - postcode
-        - state
+        - listingState
         - name
         - timestamp
         - email
         - listingType
+        - address
+        - country
       properties:
         id:
           type: string
@@ -248,6 +250,8 @@ components:
           type: string
           example: VIC
         address:
+          type: string
+        country:
           type: string
         listingType:
           type: string
@@ -275,6 +279,7 @@ components:
         - name
         - timestamp
         - listingType
+        - country
       properties:
         id:
           type: string
@@ -296,6 +301,8 @@ components:
           type: string
           example: VIC
         listingType:
+          type: string
+        country:
           type: string
         name:
           type: string
@@ -331,6 +338,8 @@ components:
         - listingState
         - name
         - listingType
+        - address
+        - country
       properties:
         email: 
           type: string
@@ -349,6 +358,8 @@ components:
           type: string
           example: VIC
         address:
+          type: string
+        country:
           type: string
         listingType:
           type: string
