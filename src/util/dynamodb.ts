@@ -47,7 +47,6 @@ export const queryListingsByType = async (tableName: string, listingType: string
     const dbParams: DynamoDB.DocumentClient.QueryInput = {
         TableName: tableName,
         IndexName: "gsi_listingType",
-        Limit: 1,
         KeyConditionExpression: 'listingType = :key',
         ExpressionAttributeValues: {':key': listingType}
     };
