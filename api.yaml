@@ -50,26 +50,6 @@ paths:
         '404':
           description: The listing does not exist.
 
-  /listings:
-    get:
-      summary: Returns an array of all listings.
-      operationId: ReadListings
-      description: Returns an array of all listings.
-      tags:
-      - listing
-      parameters:
-        - $ref: '#/components/parameters/type_filter'
-        - $ref: '#/components/parameters/state_filter'
-      responses:
-        '200':
-          description: list of listings
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ReadListing'
-
     post:
       summary: Create an Listing.
       operationId: CreateListing
