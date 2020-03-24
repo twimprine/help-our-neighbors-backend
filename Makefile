@@ -17,7 +17,7 @@ build:
 	npm run build
 
 clean:
-	rm -rf ./backend_dist
+	rm -rf ./dist
 	rm -f ./handler.zip
 	rm -f ./packaged.yaml
 	rm -rf ./node_modules
@@ -26,7 +26,7 @@ bundle:
 	echo "package src and modules into zipped handler..."
 	rm -rf node_modules
 	npm install --production
-	cp -R node_modules backend_dist && cd backend_dist && rm -rf tests && zip -r -q ../handler.zip .
+	cp -R node_modules dist && cd dist && rm -rf tests && zip -r -q ../handler.zip .
 
 package: bundle
 	echo "package cloudformation template..."
