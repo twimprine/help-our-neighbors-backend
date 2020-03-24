@@ -14,21 +14,6 @@ export const storeItem = async (tableName: string, item: any, logger: any) => {
     }
 }
 
-export const scanAllItems = async (tableName: string, logger: any) => {
-    const DDB = new DynamoDB.DocumentClient()
-    try {
-        const dbParams: AWS.DynamoDB.DocumentClient.ScanInput = {
-            TableName: tableName,
-            Select: "ALL_ATTRIBUTES"
-        }
-        const response = await DDB.scan(dbParams).promise()
-        logger.info({response}, "Scanned all items in DynamoDB")
-        return response.Items
-    } catch (error) {
-        logger.error({error}, "Error retrieving items in DynamoDB");
-    }
-}
-
 export const getItem = async (tableName: string, itemId: string, logger: any) => {
     const DDB = new DynamoDB.DocumentClient()
     const dbParams: DynamoDB.DocumentClient.GetItemInput = {
@@ -62,6 +47,7 @@ export const queryListingsByType = async (tableName: string, listingType: string
     const dbParams: DynamoDB.DocumentClient.QueryInput = {
         TableName: tableName,
         IndexName: "gsi_listingType",
+        Limit: 1,
         KeyConditionExpression: 'listingType = :key',
         ExpressionAttributeValues: {':key': listingType}
     };

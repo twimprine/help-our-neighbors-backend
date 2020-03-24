@@ -117,11 +117,6 @@ Resources:
           Properties:
             Path: /listings
             Method: post
-        ListingsGet:
-          Type: Api
-          Properties:
-            Path: /listings
-            Method: get
         ListingsOfferGet:
           Type: Api
           Properties:

@@ -3,7 +3,7 @@
       "target": "es2017",
       "module": "commonjs",
       "rootDir": "./src",
-      "outDir": "./dist",
+      "outDir": "./backend_dist",
       "lib": [
         "es2015"
       ],

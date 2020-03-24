@@ -2,7 +2,7 @@
 
 import bunyan from 'bunyan'
 import Mailgun from 'mailgun-js'
-import { deleteItem, getItem, queryListingsByType, scanAllItems, storeItem } from "./util/dynamodb"
+import { deleteItem, getItem, queryListingsByType, storeItem } from "./util/dynamodb"
 import { sendListingConfirmationEmail } from "./util/email"
 import { getNextToken, parseNextToken } from "./util/pagination"
 import { v4 as uuidv4 } from 'uuid';
@@ -109,37 +109,6 @@ const postListing = async (body: ListingPostData) => {
     };
 }
 
-const getListings = async (event: any) => {
-
-    // Use Global Secondary Index when filter params given. Most requests filter by `listingType`
-    let items
-    const qs = event.queryStringParameters
-    if (qs) {
-        const data = await queryListingsByType(LISTING_DDB_TABLE, qs.type_filter, logger, qs.state_filter)
-        logger.info({data}, "Queried listing by type")
-        items = data.Items
-    } else {
-        logger.info("No Query Strings. Performing DDB scan")
-        items = await scanAllItems(LISTING_DDB_TABLE, logger)
-    }
-    if (items) {
-        // don't return emails and address for security reasons
-        const cleanedItems = items.map((item: any) => { return cleanListing(item) })
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify(cleanedItems),
-            headers: corsHeaders
-        };
-    } else {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({"error": "error fetching listings"}),
-            headers: corsHeaders
-        };
-    }
-}
-
 const getListingsPaginated = async (event: any, listingType: string) => {
     const qs = event.queryStringParameters
     const stateFilter = qs ? qs.state_filter : undefined
@@ -229,9 +198,6 @@ export const handler = async (event: any) => {
 
     switch(httpMethod) {
         case "GET":
-            if (event.path === "/listings") {
-                return  await getListings(event)
-            }
             if (event.path === "/listings/offer") {
                 return  await getListingsPaginated(event, "offer")
             }
