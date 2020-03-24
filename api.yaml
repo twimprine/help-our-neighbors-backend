@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   title: helpful-neighbours
-  description: An API for Helpful Neighbours https://www.helpfulneighbours.com.au/. Uses API Key Authorization.
+  description: REST API for Helpful Neighbours https://www.helpfulneighbours.com.au/. Uses API Key Authorization.
   version: 2019-11-07
 
 paths:
