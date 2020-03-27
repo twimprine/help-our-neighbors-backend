@@ -37,7 +37,7 @@ package: bundle
 		--s3-prefix sam
 
 deploy:
-	echo "deploy stack ${STACK_NAME}..."
+	echo "deploy stack ${STACK_NAME}... S3 = ${S3_BUCKET}"
 	sam deploy \
 		--template-file packaged.yaml \
 		--stack-name "${STACK_NAME}" \
@@ -45,6 +45,8 @@ deploy:
 		--parameter-overrides \
 			MailGunApiKey="${MAIL_GUN_API_KEY}" \
 			Domain="${DOMAIN}" \
+
+deploy-test: deploy
 
 deploy-stack: clean install build package deploy
 
