@@ -4,7 +4,7 @@ const HTML_HEADERS = `
     xmlns:v="urn:schemas-microsoft-com:vml"
     xmlns:o="urn:schemas-microsoft-com:office:office">
     <head>
-    <title>Helpful Neighbours</title>
+    <title>Helpful Neighbors</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0 " />
@@ -35,7 +35,7 @@ export const getReplyToOfferEmailTemplate = (senderName: string | undefined, rec
         <p>
         Hi ${recipientName},
         <br><br>
-        Someone's gotten in touch about your ask/offer of help on helpful neighbours! Here's their message:
+        Someone's gotten in touch about your ask/offer of help on helpful neighbors! Here's their message:
         <br><br>
         <i>"${message}"</i>
         <br><br>
@@ -58,7 +58,7 @@ export const getReplyToOfferConfirmationEmailTemplate = (senderName: string, rec
         <p>
         Hi ${senderName},
         <br><br>
-        We've let ${recipientName} know about your ask/offer of help on helpful neighbours.
+        We've let ${recipientName} know about your ask/offer of help on helpful neighbors.
         <br><br>
         Cheers!
         </p>
@@ -76,11 +76,11 @@ export const getListingConfirmationEmailTemplate = (name: string, listingId: str
         <p>
         Hi ${name},
         <br><br>
-        We've added your ask/offer of help on helpful neighbours.
+        We've added your ask/offer of help on helpful neighbors.
         <br><br>
         This link can be used to remove your listing at any time:
         <br>
-        https://www.helpfulneighbours.com/delete-listing?secretToken=${secretToken}&listingId=${listingId}
+        https://www.helpourneighbors.com/delete-listing?secretToken=${secretToken}&listingId=${listingId}
         <br><br>
         Cheers!
         </p>
