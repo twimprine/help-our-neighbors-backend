@@ -3,7 +3,8 @@
 
 [Help Our Neighbors](https://helpourneighbors.com/) is a Networking Support Site with its orgins in the COVID-19 Pandemic.
 
-This code was originally forked from and we really appreciate the help and assitance!
+This code was originally forked from a similar project in Australia and we really appreciate thier help and assitance!
+
 [Helpful Neighbours](http://www.helpfulneighbours.com.au/) is a COVID-19 Support Network website.
 
 
