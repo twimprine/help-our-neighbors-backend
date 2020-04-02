@@ -42,7 +42,10 @@
     "@types/jest": "^24.0.13",
     "@types/node": "^12.7.2",
     "aws-sdk": "^2.521.0",
+    "express": "^4.17.1",
     "jest": "^24.8.0",
+    "swagger-ui": "^3.25.0",
+    "swagger-ui-dist": "^3.25.0",
     "ts-jest": "^24.0.2",
     "typescript": "^3.4.5"
   },

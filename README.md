@@ -1,6 +1,12 @@
 # helpful-neighbours-backend
 
+
+[Help Our Neighbors](https://helpourneighbors.com/) is a Networking Support Site with its orgins in the COVID-19 Pandemic.
+
+This code was originally forked from and we really appreciate the help and assitance!
 [Helpful Neighbours](http://www.helpfulneighbours.com.au/) is a COVID-19 Support Network website.
+
+
 
 This repo contains the code for the serverless backend hosted on AWS. It contains:
 - REST API (AWS API Gateway and AWS Lambda)  
@@ -20,6 +26,8 @@ This repo contains the code for the serverless backend hosted on AWS. It contain
 ## Packaging and deployment
 
 Create an IAM user and add a profile for `helpful-neighbours` to your AWS Credentials file.
+Apply the attached policy to the created IAM user 'aws-policies/deploy_policy.json' for the appropriate deployment permissions. Apply this
+policy to any account or process that will be deploying your application.
 
 Create a `.envrc` file with the following variables:
 ```
@@ -30,6 +38,7 @@ export S3_BUCKET=helpful-neighbours-backend
 export STACK_NAME=helpful-neighbours-backend
 export MAIL_GUN_API_KEY=""
 export DOMAIN=""
+export apiGatewayKey=""
 ```
 
 Run:
