@@ -1,8 +1,8 @@
 openapi: 3.0.0
 
 info:
-  title: helpful-neighbours
-  description: REST API for Helpful Neighbours https://www.helpfulneighbours.com.au/. Uses API Key Authorization.
+  title: helpful-neighbors
+  description: REST API for Helpful Neighbors https://www.helpourneighbors.com/. Uses API Key Authorization.
   version: 2019-11-07
 
 paths:
@@ -154,7 +154,7 @@ components:
       example: VIC
       schema:
         type: string
-
+    
   schemas:
     
     SendEmail:
@@ -365,3 +365,12 @@ components:
           type: string
         name:
           type: string
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey 
+      in: header
+      name: X-API-KEY
+
+security:
+  - ApiKeyAuth: [${apiKey}]

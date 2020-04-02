@@ -37,7 +37,7 @@ package: bundle
 		--s3-prefix sam
 
 deploy:
-	echo "deploy stack ${STACK_NAME}... S3 = ${S3_BUCKET}"
+	echo "deploy stack ${STACK_NAME}... "
 	sam deploy \
 		--template-file packaged.yaml \
 		--stack-name "${STACK_NAME}" \
